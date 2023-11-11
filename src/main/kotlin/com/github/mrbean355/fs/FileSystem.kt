@@ -1,73 +1,42 @@
 package com.github.mrbean355.fs
 
-private const val DELIMITER = "/"
+interface FileSystem {
 
-class FileSystem {
-    private val root = FsNode.Dir("/")
+    /**
+     * Create a new directory at the given path.
+     */
+    fun mkdir(path: String)
 
-    fun mkdir(path: String) {
-        if (path == DELIMITER) {
-            return
-        }
-        var node = root
-        path.split(DELIMITER).drop(1).forEach {
-            node = node.getOrCreateDir(it)
-        }
-    }
+    /**
+     * Add content to the file at the given path.
+     * If the file does not exist, it will be created.
+     */
+    fun addContentToFile(path: String, content: String)
 
-    fun addContentToFile(path: String, content: String) {
-        val lastDelimiter = path.indexOfLast { it == '/' }
-        val parentDir = path.substring(0, lastDelimiter)
-        val name = path.substring(lastDelimiter + 1)
+    /**
+     * Read and return the content of the file at the given path.
+     * If the file does not exist, an empty string is returned.
+     */
+    fun readContentFromFile(path: String): String
 
-        mkdir(parentDir)
+    /**
+     * List the files and directories at the given path.
+     * The output will be in lexicographical order.
+     */
+    fun ls(path: String): List<String>
 
-        var node = root
-        parentDir.split(DELIMITER).drop(1).forEach {
-            node = node.getDir(it)
-        }
-        node.getOrCreateFile(name).content += content
-    }
+    /**
+     * Remove the file or directory at the given path.
+     */
+    fun rm(path: String)
 
-    fun readContentFromFile(path: String): String {
-        val lastDelimiter = path.indexOfLast { it == '/' }
-        val parentDir = path.substring(0, lastDelimiter)
-        val name = path.substring(lastDelimiter + 1)
+    /**
+     * Print the entire file system in a tree structure.
+     */
+    fun print()
 
-        var node = root
-        parentDir.split(DELIMITER).drop(1).forEach {
-            node = node.getDir(it)
-        }
-        return node.getFile(name).content
-    }
+}
 
-    fun ls(path: String): List<String> {
-        if (path == DELIMITER) {
-            return root.list()
-        }
-        var node = root
-        path.split(DELIMITER).drop(1).forEach {
-            node = node.getDir(it)
-        }
-        return node.list()
-    }
-
-    fun rm(path: String) {
-        if (path == DELIMITER) {
-            error("Cannot delete the root directory!")
-        }
-        val lastDelimiter = path.indexOfLast { it == '/' }
-        val parentDir = path.substring(0, lastDelimiter)
-        val name = path.substring(lastDelimiter + 1)
-
-        var node = root
-        parentDir.split(DELIMITER).drop(1).forEach {
-            node = node.getDir(it)
-        }
-        node.delete(name)
-    }
-
-    fun print() {
-        root.print()
-    }
+fun FileSystem(): FileSystem {
+    return FileSystemImpl()
 }
