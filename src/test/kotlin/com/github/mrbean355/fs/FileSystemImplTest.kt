@@ -279,6 +279,51 @@ class FileSystemImplTest {
         }
     }
 
+    @Test
+    fun testRm_OnRootDirectory_ThrowsException() {
+        assertThrows<IllegalStateException> {
+            fs.rm("/")
+        }
+    }
+
+    @Test
+    fun testRm_OnNestedDirectory_RemovesNodeFromChildren() {
+        root.getOrCreateDir("foo")
+
+        fs.rm("/foo")
+
+        root.verify("/")
+    }
+
+    @Test
+    fun testRm_OnFileInRoot_RemovesNodeFromChildren() {
+        root.getOrCreateDir("foo.txt")
+
+        fs.rm("/foo.txt")
+
+        root.verify("/")
+    }
+
+    @Test
+    fun testRm_OnNestedFile_RemovesNodeFromChildren() {
+        root.getOrCreateDir("foo")
+            .getOrCreateFile("bar.txt")
+
+        fs.rm("/foo/bar.txt")
+
+        root.verify("/", children = 1)
+        root.getDir("foo").verify("foo")
+    }
+
+    @Test
+    fun testRm_OnNonExistentPath_ThrowsException() {
+        root.getOrCreateDir("foo")
+
+        assertThrows<NoSuchElementException> {
+            fs.rm("/bar/baz")
+        }
+    }
+
     private fun FsNode.Dir.verify(name: String, children: Int = 0) {
         assertEquals(name, this.name)
         assertEquals(children, this.list().size)
