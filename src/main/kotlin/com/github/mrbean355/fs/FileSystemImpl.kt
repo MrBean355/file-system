@@ -2,8 +2,9 @@ package com.github.mrbean355.fs
 
 private const val DELIMITER = "/"
 
-class FileSystemImpl : FileSystem {
-    private val root = FsNode.Dir("/")
+class FileSystemImpl(
+    private val root: FsNode.Dir = FsNode.Dir("/"),
+) : FileSystem {
 
     override fun mkdir(path: String) {
         if (path == DELIMITER) {
