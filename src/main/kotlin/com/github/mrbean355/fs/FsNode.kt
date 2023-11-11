@@ -14,8 +14,10 @@ sealed class FsNode(
         }
     }
 
-    class Dir(name: String) : FsNode(name) {
-        private val children: MutableMap<String, FsNode> = mutableMapOf()
+    class Dir(
+        name: String,
+        private val children: MutableMap<String, FsNode> = mutableMapOf(),
+    ) : FsNode(name) {
 
         override fun print(indent: String) {
             println(indent + "Dir: $name")
@@ -47,7 +49,7 @@ sealed class FsNode(
         }
 
         fun list(): List<String> {
-            return children.keys.toList()
+            return children.keys.sorted()
         }
     }
 }
