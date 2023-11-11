@@ -225,6 +225,60 @@ class FileSystemImplTest {
         assertEquals("Hello world", result)
     }
 
+    @Test
+    fun testLs_OnRootDirectory_ReturnsSortedContents() {
+        root.getOrCreateDir("foo")
+            .getOrCreateFile("bar.txt")
+        root.getOrCreateFile("baz.txt")
+
+        val result = fs.ls("/")
+
+        assertEquals(2, result.size)
+        assertEquals("baz.txt", result[0])
+        assertEquals("foo", result[1])
+    }
+
+    @Test
+    fun testLs_OnNestedDirectory_ReturnsSortedContents() {
+        root.getOrCreateDir("foo").also {
+            it.getOrCreateFile("baz.txt")
+            it.getOrCreateFile("bar.txt")
+        }
+
+        val result = fs.ls("/foo")
+
+        assertEquals(2, result.size)
+        assertEquals("bar.txt", result[0])
+        assertEquals("baz.txt", result[1])
+    }
+
+    @Test
+    fun testLs_OnEmptyDirectory_ReturnsEmptyList() {
+        root.getOrCreateDir("foo")
+
+        val result = fs.ls("/foo")
+
+        assertTrue(result.isEmpty())
+    }
+
+    @Test
+    fun testLs_OnNonExistentDirectory_ThrowsException() {
+        root.getOrCreateDir("foo")
+
+        assertThrows<NoSuchElementException> {
+            fs.ls("/bar")
+        }
+    }
+
+    @Test
+    fun testLs_OnExistingFile_ThrowsException() {
+        root.getOrCreateFile("foo.txt")
+
+        assertThrows<ClassCastException> {
+            fs.ls("/foo.txt")
+        }
+    }
+
     private fun FsNode.Dir.verify(name: String, children: Int = 0) {
         assertEquals(name, this.name)
         assertEquals(children, this.list().size)
