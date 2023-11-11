@@ -117,12 +117,89 @@ class FileSystemImplTest {
         }
     }
 
+    @Test
+    fun testAddContentToFile_ToRootDirectory_ThrowsException() {
+        assertThrows<IllegalStateException> {
+            fs.addContentToFile("/", "explode")
+        }
+    }
+
+    @Test
+    fun testAddContentToFile_ToNestedDirectory_ThrowsException() {
+        root.getOrCreateDir("foo")
+
+        assertThrows<ClassCastException> {
+            fs.addContentToFile("/foo", "explode")
+        }
+    }
+
+    @Test
+    fun testAddContentToFile_InRootDirectory_FileDoesNotExist_CreatesFile() {
+        fs.addContentToFile("/foo.txt", "It works")
+
+        root.verify("/", children = 1)
+        root.getFile("foo.txt").verify("foo.txt", "It works")
+    }
+
+    @Test
+    fun testAddContentToFile_InRootDirectory_FileExists_AppendsContent() {
+        root.getOrCreateFile("foo.txt")
+            .content = "Hello world"
+
+        fs.addContentToFile("/foo.txt", ", it works")
+
+        root.verify("/", children = 1)
+        root.getFile("foo.txt").verify("foo.txt", "Hello world, it works")
+    }
+
+    @Test
+    fun testAddContentToFile_InNestedDirectory_FileDoesNotExist_CreatesDirectoriesAndFile() {
+        fs.addContentToFile("/foo/bar/baz.txt", "It works")
+
+        root.verify("/", children = 1)
+
+        val foo = root.getDir("foo")
+        foo.verify("foo", children = 1)
+
+        val bar = foo.getDir("bar")
+        bar.verify("bar", children = 1)
+
+        val baz = bar.getFile("baz.txt")
+        baz.verify("baz.txt", "It works")
+    }
+
+    @Test
+    fun testAddContentToFile_InNestedDirectory_FileExists_AppendsContent() {
+        val foo = root.getOrCreateDir("foo")
+        val bar = foo.getOrCreateDir("bar")
+        val baz = bar.getOrCreateFile("baz.txt")
+            .also { it.content = "Hello world" }
+
+        fs.addContentToFile("/foo/bar/baz.txt", ", it works")
+
+        root.verify("/", children = 1)
+
+        root.getDir("foo").verify(foo)
+        foo.verify("foo", children = 1)
+
+        foo.getDir("bar").verify(bar)
+        bar.verify("bar", children = 1)
+
+        bar.getFile("baz.txt").verify(baz)
+        baz.verify("baz.txt", "Hello world, it works")
+    }
+
     private fun FsNode.Dir.verify(name: String, children: Int = 0) {
         assertEquals(name, this.name)
         assertEquals(children, this.list().size)
     }
 
-    private fun FsNode.Dir.verify(expected: FsNode.Dir) {
+    private fun FsNode.verify(expected: FsNode) {
         assertSame(expected, this)
+    }
+
+    private fun FsNode.File.verify(name: String, content: String) {
+        assertEquals(name, this.name)
+        assertEquals(content, this.content)
     }
 }

@@ -17,6 +17,9 @@ class FileSystemImpl(
     }
 
     override fun addContentToFile(path: String, content: String) {
+        if (path == DELIMITER) {
+            error("Cannot add content to root")
+        }
         val lastDelimiter = path.indexOfLast { it == '/' }
         val parentDir = path.substring(0, lastDelimiter)
         val name = path.substring(lastDelimiter + 1)
