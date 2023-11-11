@@ -38,8 +38,8 @@ sealed class FsNode(
             return children.getOrPut(name) { File(name) } as File
         }
 
-        fun getFile(name: String): File {
-            return children.getValue(name) as File
+        fun findFile(name: String): File? {
+            return children[name] as File?
         }
 
         fun delete(name: String) {

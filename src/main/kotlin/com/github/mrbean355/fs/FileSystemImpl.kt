@@ -18,7 +18,7 @@ class FileSystemImpl(
 
     override fun addContentToFile(path: String, content: String) {
         if (path == DELIMITER) {
-            error("Cannot add content to root")
+            error("Cannot add content to the root directory")
         }
         val lastDelimiter = path.indexOfLast { it == '/' }
         val parentDir = path.substring(0, lastDelimiter)
@@ -34,6 +34,9 @@ class FileSystemImpl(
     }
 
     override fun readContentFromFile(path: String): String {
+        if (path == DELIMITER) {
+            error("Cannot read content from the root directory")
+        }
         val lastDelimiter = path.indexOfLast { it == '/' }
         val parentDir = path.substring(0, lastDelimiter)
         val name = path.substring(lastDelimiter + 1)
@@ -42,7 +45,7 @@ class FileSystemImpl(
         parentDir.split(DELIMITER).drop(1).forEach {
             node = node.getDir(it)
         }
-        return node.getFile(name).content
+        return node.findFile(name)?.content.orEmpty()
     }
 
     override fun ls(path: String): List<String> {

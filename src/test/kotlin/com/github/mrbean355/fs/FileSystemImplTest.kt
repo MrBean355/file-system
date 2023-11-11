@@ -138,7 +138,7 @@ class FileSystemImplTest {
         fs.addContentToFile("/foo.txt", "It works")
 
         root.verify("/", children = 1)
-        root.getFile("foo.txt").verify("foo.txt", "It works")
+        root.findFile("foo.txt")!!.verify("foo.txt", "It works")
     }
 
     @Test
@@ -149,7 +149,7 @@ class FileSystemImplTest {
         fs.addContentToFile("/foo.txt", ", it works")
 
         root.verify("/", children = 1)
-        root.getFile("foo.txt").verify("foo.txt", "Hello world, it works")
+        root.findFile("foo.txt")!!.verify("foo.txt", "Hello world, it works")
     }
 
     @Test
@@ -164,8 +164,8 @@ class FileSystemImplTest {
         val bar = foo.getDir("bar")
         bar.verify("bar", children = 1)
 
-        val baz = bar.getFile("baz.txt")
-        baz.verify("baz.txt", "It works")
+        val baz = bar.findFile("baz.txt")
+        baz!!.verify("baz.txt", "It works")
     }
 
     @Test
@@ -185,8 +185,44 @@ class FileSystemImplTest {
         foo.getDir("bar").verify(bar)
         bar.verify("bar", children = 1)
 
-        bar.getFile("baz.txt").verify(baz)
+        bar.findFile("baz.txt")!!.verify(baz)
         baz.verify("baz.txt", "Hello world, it works")
+    }
+
+    @Test
+    fun testReadContentFromFile_OnRootDirectory_ThrowsException() {
+        assertThrows<IllegalStateException> {
+            fs.readContentFromFile("/")
+        }
+    }
+
+    @Test
+    fun testReadContentFromFile_OnNestedDirectory_ThrowsException() {
+        root.getOrCreateDir("foo")
+
+        assertThrows<ClassCastException> {
+            fs.readContentFromFile("/foo")
+        }
+    }
+
+    @Test
+    fun testReadContentFromFile_OnNonExistentFile_ReturnsEmptyString() {
+        root.getOrCreateDir("foo")
+
+        val result = fs.readContentFromFile("/foo/bar.txt")
+
+        assertEquals("", result)
+    }
+
+    @Test
+    fun testReadContentFromFile_OnExistingFile_ReturnsFileContent() {
+        root.getOrCreateDir("foo")
+            .getOrCreateFile("bar.txt")
+            .also { it.content = "Hello world" }
+
+        val result = fs.readContentFromFile("/foo/bar.txt")
+
+        assertEquals("Hello world", result)
     }
 
     private fun FsNode.Dir.verify(name: String, children: Int = 0) {

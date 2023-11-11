@@ -3,10 +3,7 @@ package com.github.mrbean355.fs
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
-import kotlin.test.assertSame
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 class DirFsNodeTest {
     private lateinit var children: MutableMap<String, FsNode>
@@ -104,28 +101,28 @@ class DirFsNodeTest {
     }
 
     @Test
-    fun testGetFile_DoesNotExist_ThrowsException() {
-        assertThrows<NoSuchElementException> {
-            dir.getFile("foo")
-        }
+    fun testFindFile_DoesNotExist_ReturnsNull() {
+        val result = dir.findFile("foo")
+
+        assertNull(result)
     }
 
     @Test
-    fun testGetFile_FileExists_ReturnsSameFile() {
+    fun testFindFile_FileExists_ReturnsSameFile() {
         val existing = FsNode.File("foo")
         children["foo"] = existing
 
-        dir.getFile("foo")
+        dir.findFile("foo")
 
         assertSame(existing, children["foo"])
     }
 
     @Test
-    fun testGetFile_DirExists_ThrowsException() {
+    fun testFindFile_DirExists_ThrowsException() {
         children["foo"] = FsNode.Dir("foo")
 
         assertThrows<ClassCastException> {
-            dir.getFile("foo")
+            dir.findFile("foo")
         }
     }
 
