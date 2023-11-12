@@ -39,14 +39,14 @@ class DirectoryTest {
     fun testGetOrCreateDir_FileExists_ThrowsException() {
         children["foo"] = Node.File("foo")
 
-        assertThrows<ClassCastException> {
+        assertThrows<IllegalStateException> {
             directory.getOrCreateDir("foo")
         }
     }
 
     @Test
     fun testGetDir_DoesNotExist_ThrowsException() {
-        assertThrows<NoSuchElementException> {
+        assertThrows<IllegalStateException> {
             directory.getDir("foo")
         }
     }
@@ -65,7 +65,7 @@ class DirectoryTest {
     fun testGetDir_FileExists_ThrowsException() {
         children["foo"] = Node.File("foo")
 
-        assertThrows<ClassCastException> {
+        assertThrows<IllegalStateException> {
             directory.getDir("foo")
         }
     }
@@ -95,7 +95,7 @@ class DirectoryTest {
     fun testGetOrCreateFile_DirExists_ThrowsException() {
         children["foo"] = Node.Directory("foo")
 
-        assertThrows<ClassCastException> {
+        assertThrows<IllegalStateException> {
             directory.getOrCreateFile("foo")
         }
     }
@@ -121,7 +121,7 @@ class DirectoryTest {
     fun testFindFile_DirExists_ThrowsException() {
         children["foo"] = Node.Directory("foo")
 
-        assertThrows<ClassCastException> {
+        assertThrows<IllegalStateException> {
             directory.findFile("foo")
         }
     }

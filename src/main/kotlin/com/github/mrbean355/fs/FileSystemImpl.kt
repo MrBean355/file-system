@@ -63,8 +63,8 @@ internal class FileSystemImpl(
     /**
      * Traverse from the root directory along the [path]. The entire [path] is assumed to contain directories only.
      * Returns the [Node.Directory] of the last element in the path.
-     * If [createDirs] is true, creates missing directories, otherwise throws an exception.
-     * Throws an exception if a non-directory [Node] is encountered.
+     * If [createDirs] is true, creates missing directories, otherwise throws an [IllegalStateException].
+     * Throws an [IllegalStateException] if a non-directory [Node] is encountered.
      */
     private fun traverse(path: String, createDirs: Boolean): Node.Directory {
         if (isRoot(path)) {

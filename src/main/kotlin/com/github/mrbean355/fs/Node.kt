@@ -29,38 +29,57 @@ sealed class Node(
 
         /**
          * Get the directory with the given [name], creating it if it doesn't exist.
-         * Throws an exception if a file exists with the same name.
+         * Throws an [IllegalStateException] if a file exists with the same name.
          */
         fun getOrCreateDir(name: String): Directory {
-            return children.getOrPut(name) { Directory(name) } as Directory
+            val child = children[name]
+            if (child != null) {
+                check(child is Directory) { "Not a directory: $name" }
+                return child
+            }
+            val newDirectory = Directory(name)
+            children[name] = newDirectory
+            return newDirectory
         }
 
         /**
-         * Get the directory with the given [name], throwing an exception if it doesn't exist.
-         * Throws an exception if a file exists with the same name.
+         * Get the directory with the given [name], throwing an [IllegalStateException] if it doesn't exist.
+         * Throws an [IllegalStateException] if a file exists with the same name.
          */
         fun getDir(name: String): Directory {
-            return children.getValue(name) as Directory
+            val child = children[name]
+            check(child != null) { "No such directory: $name" }
+            check(child is Directory) { "Not a directory: $name" }
+            return child
         }
 
         /**
          * Get the file with the given [name], creating it if it doesn't exist.
-         * Throws an exception if a directory exists with the same name.
+         * Throws an [IllegalStateException] if a directory exists with the same name.
          */
         fun getOrCreateFile(name: String): File {
-            return children.getOrPut(name) { File(name) } as File
+            val child = children[name]
+            if (child != null) {
+                check(child is File) { "Not a file: $name" }
+                return child
+            }
+            val newFile = File(name)
+            children[name] = newFile
+            return newFile
         }
 
         /**
          * Get the file with the given [name], returning null if it doesn't exist.
-         * Throws an exception if a directory exists with the same name.
+         * Throws an [IllegalStateException] if a directory exists with the same name.
          */
         fun findFile(name: String): File? {
-            return children[name] as File?
+            val child = children[name] ?: return null
+            check(child is File) { "Not a file: $name" }
+            return child
         }
 
         /**
-         * Delete the file or directory with the given [name], throwing an exception if it doesn't exist.
+         * Delete the file or directory with the given [name], throwing an [IllegalStateException] if it doesn't exist.
          */
         fun delete(name: String) {
             check(children.remove(name) != null) {

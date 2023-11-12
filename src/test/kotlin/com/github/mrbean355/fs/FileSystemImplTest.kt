@@ -102,7 +102,7 @@ class FileSystemImplTest {
     fun testMkdir_ExistingFilePath_ThrowsException() {
         root.getOrCreateFile("test.txt")
 
-        assertThrows<ClassCastException> {
+        assertThrows<IllegalStateException> {
             fs.mkdir("/test.txt")
         }
     }
@@ -112,7 +112,7 @@ class FileSystemImplTest {
         root.getOrCreateDir("foo")
             .getOrCreateFile("test.txt")
 
-        assertThrows<ClassCastException> {
+        assertThrows<IllegalStateException> {
             fs.mkdir("/foo/test.txt")
         }
     }
@@ -128,7 +128,7 @@ class FileSystemImplTest {
     fun testAddContentToFile_ToNestedDirectory_ThrowsException() {
         root.getOrCreateDir("foo")
 
-        assertThrows<ClassCastException> {
+        assertThrows<IllegalStateException> {
             fs.addContentToFile("/foo", "explode")
         }
     }
@@ -200,7 +200,7 @@ class FileSystemImplTest {
     fun testReadContentFromFile_OnNestedDirectory_ThrowsException() {
         root.getOrCreateDir("foo")
 
-        assertThrows<ClassCastException> {
+        assertThrows<IllegalStateException> {
             fs.readContentFromFile("/foo")
         }
     }
@@ -265,7 +265,7 @@ class FileSystemImplTest {
     fun testLs_OnNonExistentDirectory_ThrowsException() {
         root.getOrCreateDir("foo")
 
-        assertThrows<NoSuchElementException> {
+        assertThrows<IllegalStateException> {
             fs.ls("/bar")
         }
     }
@@ -274,7 +274,7 @@ class FileSystemImplTest {
     fun testLs_OnExistingFile_ThrowsException() {
         root.getOrCreateFile("foo.txt")
 
-        assertThrows<ClassCastException> {
+        assertThrows<IllegalStateException> {
             fs.ls("/foo.txt")
         }
     }
@@ -319,7 +319,7 @@ class FileSystemImplTest {
     fun testRm_OnNonExistentPath_ThrowsException() {
         root.getOrCreateDir("foo")
 
-        assertThrows<NoSuchElementException> {
+        assertThrows<IllegalStateException> {
             fs.rm("/bar/baz")
         }
     }
