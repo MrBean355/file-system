@@ -14,7 +14,7 @@ class FileSystemImplTest {
     @BeforeEach
     fun setUp() {
         root = FsNode.Dir("/")
-        fs = FileSystemImpl(root)
+        fs = FileSystemImpl('/', root)
     }
 
     @Test

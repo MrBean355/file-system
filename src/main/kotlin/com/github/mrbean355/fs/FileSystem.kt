@@ -38,5 +38,5 @@ interface FileSystem {
 }
 
 fun FileSystem(): FileSystem {
-    return FileSystemImpl()
+    return FileSystemImpl(delimiter = '/')
 }
