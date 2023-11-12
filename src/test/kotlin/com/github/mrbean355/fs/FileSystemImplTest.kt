@@ -8,12 +8,12 @@ import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
 class FileSystemImplTest {
-    private lateinit var root: FsNode.Dir
+    private lateinit var root: Node.Directory
     private lateinit var fs: FileSystemImpl
 
     @BeforeEach
     fun setUp() {
-        root = FsNode.Dir("/")
+        root = Node.Directory("/")
         fs = FileSystemImpl('/', root)
     }
 
@@ -324,16 +324,16 @@ class FileSystemImplTest {
         }
     }
 
-    private fun FsNode.Dir.verify(name: String, children: Int = 0) {
+    private fun Node.Directory.verify(name: String, children: Int = 0) {
         assertEquals(name, this.name)
         assertEquals(children, this.list().size)
     }
 
-    private fun FsNode.verify(expected: FsNode) {
+    private fun Node.verify(expected: Node) {
         assertSame(expected, this)
     }
 
-    private fun FsNode.File.verify(name: String, content: String) {
+    private fun Node.File.verify(name: String, content: String) {
         assertEquals(name, this.name)
         assertEquals(content, this.content)
     }

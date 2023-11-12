@@ -1,24 +1,24 @@
 package com.github.mrbean355.fs
 
-sealed class FsNode(
+sealed class Node(
     val name: String,
 ) {
 
     abstract fun print(indent: String = "")
 
-    class File(name: String) : FsNode(name) {
+    class File(name: String) : Node(name) {
 
         var content: String = ""
 
         override fun print(indent: String) {
-            println(indent + "File: $name -> \"$content\"¡¡")
+            println(indent + "File: $name -> \"$content\"")
         }
     }
 
-    class Dir(
+    class Directory(
         name: String,
-        private val children: MutableMap<String, FsNode> = mutableMapOf(),
-    ) : FsNode(name) {
+        private val children: MutableMap<String, Node> = mutableMapOf(),
+    ) : Node(name) {
 
         override fun print(indent: String) {
             println(indent + "Dir: $name")
@@ -31,16 +31,16 @@ sealed class FsNode(
          * Get the directory with the given [name], creating it if it doesn't exist.
          * Throws an exception if a file exists with the same name.
          */
-        fun getOrCreateDir(name: String): Dir {
-            return children.getOrPut(name) { Dir(name) } as Dir
+        fun getOrCreateDir(name: String): Directory {
+            return children.getOrPut(name) { Directory(name) } as Directory
         }
 
         /**
          * Get the directory with the given [name], throwing an exception if it doesn't exist.
          * Throws an exception if a file exists with the same name.
          */
-        fun getDir(name: String): Dir {
-            return children.getValue(name) as Dir
+        fun getDir(name: String): Directory {
+            return children.getValue(name) as Directory
         }
 
         /**

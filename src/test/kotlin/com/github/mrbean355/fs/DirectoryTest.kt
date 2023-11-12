@@ -5,141 +5,141 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.*
 
-class DirFsNodeTest {
-    private lateinit var children: MutableMap<String, FsNode>
-    private lateinit var dir: FsNode.Dir
+class DirectoryTest {
+    private lateinit var children: MutableMap<String, Node>
+    private lateinit var directory: Node.Directory
 
     @BeforeEach
     fun setUp() {
         children = mutableMapOf()
-        dir = FsNode.Dir("test", children)
+        directory = Node.Directory("test", children)
     }
 
     @Test
     fun testGetOrCreateDir_DoesNotExist_CreatesNewDir() {
-        dir.getOrCreateDir("foo")
+        directory.getOrCreateDir("foo")
 
         val result = children["foo"]
         assertNotNull(result)
-        assertTrue(result is FsNode.Dir)
+        assertTrue(result is Node.Directory)
         assertEquals("foo", result.name)
     }
 
     @Test
     fun testGetOrCreateDir_DirExists_ReturnsSameDir() {
-        val existing = FsNode.Dir("foo")
+        val existing = Node.Directory("foo")
         children["foo"] = existing
 
-        dir.getOrCreateDir("foo")
+        directory.getOrCreateDir("foo")
 
         assertSame(existing, children["foo"])
     }
 
     @Test
     fun testGetOrCreateDir_FileExists_ThrowsException() {
-        children["foo"] = FsNode.File("foo")
+        children["foo"] = Node.File("foo")
 
         assertThrows<ClassCastException> {
-            dir.getOrCreateDir("foo")
+            directory.getOrCreateDir("foo")
         }
     }
 
     @Test
     fun testGetDir_DoesNotExist_ThrowsException() {
         assertThrows<NoSuchElementException> {
-            dir.getDir("foo")
+            directory.getDir("foo")
         }
     }
 
     @Test
     fun testGetDir_DirExists_ReturnsSameDir() {
-        val existing = FsNode.Dir("foo")
+        val existing = Node.Directory("foo")
         children["foo"] = existing
 
-        dir.getDir("foo")
+        directory.getDir("foo")
 
         assertSame(existing, children["foo"])
     }
 
     @Test
     fun testGetDir_FileExists_ThrowsException() {
-        children["foo"] = FsNode.File("foo")
+        children["foo"] = Node.File("foo")
 
         assertThrows<ClassCastException> {
-            dir.getDir("foo")
+            directory.getDir("foo")
         }
     }
 
     @Test
     fun testGetOrCreateFile_DoesNotExist_CreatesNewFile() {
-        dir.getOrCreateFile("foo")
+        directory.getOrCreateFile("foo")
 
         val result = children["foo"]
         assertNotNull(result)
-        assertTrue(result is FsNode.File)
+        assertTrue(result is Node.File)
         assertEquals("foo", result.name)
         assertEquals("", result.content)
     }
 
     @Test
     fun testGetOrCreateFile_FileExists_ReturnsSameFile() {
-        val existing = FsNode.File("foo")
+        val existing = Node.File("foo")
         children["foo"] = existing
 
-        dir.getOrCreateFile("foo")
+        directory.getOrCreateFile("foo")
 
         assertSame(existing, children["foo"])
     }
 
     @Test
     fun testGetOrCreateFile_DirExists_ThrowsException() {
-        children["foo"] = FsNode.Dir("foo")
+        children["foo"] = Node.Directory("foo")
 
         assertThrows<ClassCastException> {
-            dir.getOrCreateFile("foo")
+            directory.getOrCreateFile("foo")
         }
     }
 
     @Test
     fun testFindFile_DoesNotExist_ReturnsNull() {
-        val result = dir.findFile("foo")
+        val result = directory.findFile("foo")
 
         assertNull(result)
     }
 
     @Test
     fun testFindFile_FileExists_ReturnsSameFile() {
-        val existing = FsNode.File("foo")
+        val existing = Node.File("foo")
         children["foo"] = existing
 
-        dir.findFile("foo")
+        directory.findFile("foo")
 
         assertSame(existing, children["foo"])
     }
 
     @Test
     fun testFindFile_DirExists_ThrowsException() {
-        children["foo"] = FsNode.Dir("foo")
+        children["foo"] = Node.Directory("foo")
 
         assertThrows<ClassCastException> {
-            dir.findFile("foo")
+            directory.findFile("foo")
         }
     }
 
     @Test
     fun testDelete_DirExists_RemovesFromChildren() {
-        children["foo"] = FsNode.Dir("foo")
+        children["foo"] = Node.Directory("foo")
 
-        dir.delete("foo")
+        directory.delete("foo")
 
         assertTrue("foo" !in children)
     }
 
     @Test
     fun testDelete_FileExists_RemovesFromChildren() {
-        children["foo"] = FsNode.File("foo")
+        children["foo"] = Node.File("foo")
 
-        dir.delete("foo")
+        directory.delete("foo")
 
         assertTrue("foo" !in children)
     }
@@ -147,17 +147,17 @@ class DirFsNodeTest {
     @Test
     fun testDelete_ChildDoesNotExist_ThrowsException() {
         assertThrows<IllegalStateException> {
-            dir.delete("foo")
+            directory.delete("foo")
         }
     }
 
     @Test
     fun testList_ReturnsSortedChildrenNames() {
-        children["qwerty"] = FsNode.File("qwerty")
-        children["foo"] = FsNode.File("foo")
-        children["bar"] = FsNode.Dir("bar")
+        children["qwerty"] = Node.File("qwerty")
+        children["foo"] = Node.File("foo")
+        children["bar"] = Node.Directory("bar")
 
-        val result = dir.list()
+        val result = directory.list()
 
         assertEquals(3, result.size)
         assertEquals("bar", result[0])

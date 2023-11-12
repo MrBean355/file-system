@@ -2,12 +2,12 @@ package com.github.mrbean355.fs
 
 internal class FileSystemImpl(
     private val delimiter: Char,
-    private val root: FsNode.Dir,
+    private val root: Node.Directory,
 ) : FileSystem {
 
     constructor(delimiter: Char) : this(
         delimiter = delimiter,
-        root = FsNode.Dir(delimiter.toString())
+        root = Node.Directory(delimiter.toString())
     )
 
     override fun mkdir(path: String) {
@@ -62,19 +62,19 @@ internal class FileSystemImpl(
 
     /**
      * Traverse from the root directory along the [path]. The entire [path] is assumed to contain directories only.
-     * Returns the [FsNode.Dir] of the last element in the path.
+     * Returns the [Node.Directory] of the last element in the path.
      * If [createDirs] is true, creates missing directories, otherwise throws an exception.
-     * Throws an exception if a non-directory [FsNode] is encountered.
+     * Throws an exception if a non-directory [Node] is encountered.
      */
-    private fun traverse(path: String, createDirs: Boolean): FsNode.Dir {
+    private fun traverse(path: String, createDirs: Boolean): Node.Directory {
         if (isRoot(path)) {
             return root
         }
         var node = root
         val action = if (createDirs) {
-            FsNode.Dir::getOrCreateDir
+            Node.Directory::getOrCreateDir
         } else {
-            FsNode.Dir::getDir
+            Node.Directory::getDir
         }
         path.split(delimiter).drop(1).forEach { dir ->
             node = action(node, dir)
